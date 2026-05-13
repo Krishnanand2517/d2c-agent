@@ -31,4 +31,10 @@ model UniversalRecord {
   rawPayload       Json
 
   createdAt        DateTime @default(now())
+
+  @@unique([source, sourceRecordId, merchantId])
+  @@index([merchantId])
+  @@index([merchantId, source])
+  @@index([merchantId, entityType])
+  @@index([merchantId, timestamp])
 }
