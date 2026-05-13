@@ -1,5 +1,10 @@
-import type { IConnector, NormalizedRecord, SourceName } from "./base.js";
-import { RAW_ORDERS, RAW_PRODUCTS } from "../mockData/shopify.js";
+import type {
+  ConnectorHealth,
+  IConnector,
+  NormalizedRecord,
+  SourceName,
+} from "./base.ts";
+import { RAW_ORDERS, RAW_PRODUCTS } from "../mockData/shopify.ts";
 
 export class ShopifyConnector implements IConnector {
   readonly source: SourceName = "shopify";
@@ -69,5 +74,14 @@ export class ShopifyConnector implements IConnector {
 
   async fetchShipments(): Promise<NormalizedRecord[]> {
     return []; // tracked via Shiprocket
+  }
+
+  async healthCheck(): Promise<ConnectorHealth> {
+    return {
+      source: "shopify",
+      healthy: true,
+      latency_ms: 12,
+      last_checked: new Date().toISOString(),
+    };
   }
 }

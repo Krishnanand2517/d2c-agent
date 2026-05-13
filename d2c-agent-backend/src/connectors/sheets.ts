@@ -1,7 +1,12 @@
 // Sheet columns: Date | Category | Description | Amount (INR) | Notes | Channel
 
-import type { IConnector, NormalizedRecord, SourceName } from "./base.js";
-import { RAW_ROWS } from "../mockData/sheets.js";
+import type {
+  ConnectorHealth,
+  IConnector,
+  NormalizedRecord,
+  SourceName,
+} from "./base.ts";
+import { RAW_ROWS } from "../mockData/sheets.ts";
 
 export class GoogleSheetsConnector implements IConnector {
   readonly source: SourceName = "google_sheets";
@@ -44,5 +49,14 @@ export class GoogleSheetsConnector implements IConnector {
       },
       rawPayload: r as unknown as Record<string, unknown>,
     }));
+  }
+
+  async healthCheck(): Promise<ConnectorHealth> {
+    return {
+      source: "google_sheets",
+      healthy: true,
+      latency_ms: 8,
+      last_checked: new Date().toISOString(),
+    };
   }
 }

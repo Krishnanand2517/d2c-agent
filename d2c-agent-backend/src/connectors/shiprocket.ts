@@ -1,5 +1,10 @@
-import type { IConnector, NormalizedRecord, SourceName } from "./base.js";
-import { RAW_SHIPMENTS } from "../mockData/shiprocket.js";
+import type {
+  ConnectorHealth,
+  IConnector,
+  NormalizedRecord,
+  SourceName,
+} from "./base.ts";
+import { RAW_SHIPMENTS } from "../mockData/shiprocket.ts";
 
 export class ShiprocketConnector implements IConnector {
   readonly source: SourceName = "shiprocket";
@@ -47,5 +52,14 @@ export class ShiprocketConnector implements IConnector {
         rawPayload: s as unknown as Record<string, unknown>,
       };
     });
+  }
+
+  async healthCheck(): Promise<ConnectorHealth> {
+    return {
+      source: "shiprocket",
+      healthy: true,
+      latency_ms: 18,
+      last_checked: new Date().toISOString(),
+    };
   }
 }

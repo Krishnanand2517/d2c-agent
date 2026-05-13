@@ -20,6 +20,14 @@ export interface NormalizedRecord {
   rawPayload: Record<string, unknown>;
 }
 
+export interface ConnectorHealth {
+  source: SourceName;
+  healthy: boolean;
+  latency_ms: number;
+  error?: string;
+  last_checked: string;
+}
+
 export interface IConnector {
   readonly source: SourceName;
   readonly merchantId: string;
@@ -27,4 +35,5 @@ export interface IConnector {
   fetchOrders(): Promise<NormalizedRecord[]>;
   fetchInventory(): Promise<NormalizedRecord[]>;
   fetchShipments(): Promise<NormalizedRecord[]>;
+  healthCheck(): Promise<ConnectorHealth>;
 }
