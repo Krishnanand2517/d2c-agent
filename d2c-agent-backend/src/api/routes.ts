@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
 
-import { ingestAll } from "../ingest/ingestAll.js";
-import { queryRecords, getStats, getAgentRuns } from "../db/queries.js";
-import { getConnectors } from "../connectors/registry.js";
+import { ingestAll } from "../ingest/ingestAll.ts";
+import { queryRecords, getStats, getAgentRuns } from "../db/queries.ts";
+import { getConnectors } from "../connectors/registry.ts";
 
 const router = Router();
 const MERCHANT_ID = process.env.MERCHANT_ID ?? "merchant_001";
