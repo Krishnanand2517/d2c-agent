@@ -38,3 +38,29 @@ model UniversalRecord {
   @@index([merchantId, entityType])
   @@index([merchantId, timestamp])
 }
+
+model AgentRun {
+  id              String    @id @default(cuid())
+  merchantId      String
+  agentName       String
+  triggeredAt     DateTime  @default(now())
+  completedAt     DateTime?
+  status          String    @default("running")
+  rowsExamined    Int       @default(0)
+  proposedActions Json?
+  reasoning       String?
+  steps           Json?
+  error           String?
+
+  @@index([merchantId])
+}
+
+model IngestRun {
+  id           Int       @id @default(autoincrement())
+  merchantId   String
+  source       String
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
+  rowsUpserted Int       @default(0)
+  error        String?
+}
