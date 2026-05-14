@@ -1,32 +1,27 @@
 import { serve } from "bun";
 import index from "./index.html";
 
+const API_TARGET = "http://localhost:8000";
+
 const server = serve({
+  port: 5173,
+
   routes: {
-    // Serve index.html for all unmatched routes.
-    "/*": index,
+    // Proxy all /api requests
+    "/api/*": async (req) => {
+      const url = new URL(req.url);
 
-    "/api/hello": {
-      async GET(req) {
-        return Response.json({
-          message: "Hello, world!",
-          method: "GET",
-        });
-      },
-      async PUT(req) {
-        return Response.json({
-          message: "Hello, world!",
-          method: "PUT",
-        });
-      },
-    },
+      const proxyUrl = API_TARGET + url.pathname + url.search;
 
-    "/api/hello/:name": async req => {
-      const name = req.params.name;
-      return Response.json({
-        message: `Hello, ${name}!`,
+      return fetch(proxyUrl, {
+        method: req.method,
+        headers: req.headers,
+        body: req.body,
       });
     },
+
+    // Serve index.html for all unmatched routes.
+    "/*": index,
   },
 
   development: process.env.NODE_ENV !== "production" && {

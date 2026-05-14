@@ -1,1 +1,126 @@
 @import "tailwindcss";
+
+@theme {
+  /* Fonts */
+  --font-sans: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Syne", sans-serif;
+
+  /* Ink colors */
+  --color-ink-950: #09090f;
+  --color-ink-900: #111118;
+  --color-ink-800: #1a1a26;
+  --color-ink-700: #252535;
+  --color-ink-600: #32324a;
+  --color-ink-400: #6b6b8a;
+  --color-ink-200: #a8a8c4;
+  --color-ink-100: #d4d4e8;
+  --color-ink-50:  #f0f0f8;
+
+  /* Signal colors */
+  --color-signal-green: #00e5a0;
+  --color-signal-amber: #ffb547;
+  --color-signal-red:   #ff5370;
+  --color-signal-blue:  #4d9fff;
+
+  /* Animations */
+  --animate-slide-up: slideUp 0.25s ease-out;
+  --animate-fade-in: fadeIn 0.2s ease-out;
+  --animate-blink: blink 1.4s ease-in-out infinite;
+  --animate-spin-fast: spin 0.8s linear infinite;
+}
+
+@layer base {
+  body {
+    @apply bg-ink-950 text-ink-100 font-sans antialiased;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #32324a #111118;
+  }
+
+  *::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #111118;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: #32324a;
+    border-radius: 2px;
+  }
+}
+
+@utility card {
+  @apply bg-ink-900 border border-ink-700 rounded-xl;
+}
+
+@utility btn {
+  @apply px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+@utility btn-primary {
+  @apply btn bg-signal-green text-ink-950 hover:opacity-90;
+}
+
+@utility btn-ghost {
+  @apply btn bg-ink-800 text-ink-200 border border-ink-700 hover:bg-ink-700;
+}
+
+@utility badge-shopify {
+  @apply px-2 py-0.5 rounded-full text-xs font-mono bg-emerald-950 text-emerald-400 border border-emerald-900;
+}
+
+@utility badge-shiprocket {
+  @apply px-2 py-0.5 rounded-full text-xs font-mono bg-orange-950 text-orange-400 border border-orange-900;
+}
+
+@utility badge-sheets {
+  @apply px-2 py-0.5 rounded-full text-xs font-mono bg-blue-950 text-blue-400 border border-blue-900;
+}
+
+@utility citation {
+  @apply inline-flex items-center px-1.5 py-0.5 rounded text-xs font-mono border mx-0.5 cursor-help;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
