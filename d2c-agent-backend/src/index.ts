@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 
@@ -6,13 +6,11 @@ import routes from "./api/routes.ts";
 import { prisma } from "./db/client.ts";
 import { ingestAll } from "./ingest/ingestAll.ts";
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 const MERCHANT_ID = process.env.MERCHANT_ID ?? "merchant_001";
 
-app.use(cors({ origin: ["http://localhost:3000"] }));
+app.use(cors({ origin: ["http://localhost:5173"] }));
 app.use(express.json());
 app.use("/api", routes);
 
