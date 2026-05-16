@@ -3,6 +3,8 @@ import { Router, type Request, type Response } from "express";
 import { ingestAll } from "../ingest/ingestAll.ts";
 import { queryRecords, getStats, getAgentRuns } from "../db/queries.ts";
 import { getConnectors } from "../connectors/registry.ts";
+import { chat, type ChatMessage } from "../chat/chatHandler.ts";
+import { runShippingCostAgent } from "../agent/shippingCostAgent.ts";
 
 const router = Router();
 const MERCHANT_ID = process.env.MERCHANT_ID ?? "merchant_001";
@@ -61,6 +63,26 @@ router.get("/expenses", async (_req: Request, res: Response) => {
       limit: 100,
     }),
   );
+});
+
+router.post("/chat", async (req: Request, res: Response) => {
+  const { messages } = req.body as { messages: ChatMessage[] };
+  if (!Array.isArray(messages))
+    return res.status(400).json({ error: "messages array required" });
+
+  try {
+    res.json(await chat(messages, MERCHANT_ID));
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+router.post("/agent/run", async (_req: Request, res: Response) => {
+  try {
+    res.json(await runShippingCostAgent(MERCHANT_ID));
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
 });
 
 router.get("/agent/runs", async (_req: Request, res: Response) => {
