@@ -1,4 +1,4 @@
-import { getAgentRuns, getStats, queryRecords } from "../db/queries";
+import { getAgentRuns, getStats, queryRecords } from "../db/queries.ts";
 
 function citationId(r: {
   source: string;

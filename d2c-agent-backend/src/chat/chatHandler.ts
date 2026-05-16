@@ -1,11 +1,10 @@
-// src/chat/chatHandler.ts
 import OpenAI from "openai";
-import { executeTool } from "./tools.js";
-import { CHAT_TOOLS } from "./toolDef.js";
+import { executeTool } from "./tools.ts";
+import { CHAT_TOOLS } from "./toolDef.ts";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const SYSTEM_PROMPT = `You are an AI employee for a D2C (direct-to-consumer) brand operating in India. You have unified access to data from Shopify (orders/inventory), Shiprocket (shipments/logistics), and Google Sheets (expenses/ops).
+const SYSTEM_PROMPT = `You are an AI employee for a D2C (direct-to-consumer) brand. You have unified access to data from Shopify (orders/inventory), Shiprocket (shipments/logistics), and Google Sheets (expenses/ops).
 
 ## CITATION CONTRACT — NON-NEGOTIABLE
 
