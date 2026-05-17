@@ -12,44 +12,49 @@ import { v4 as uuid } from "uuid";
 import { executeTool } from "../chat/tools.ts";
 import { saveAgentRun } from "../db/queries.ts";
 import { CHAT_TOOLS } from "../chat/toolDef.ts";
+import { computeSavings } from "./computeSavings.ts";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const MAX_STEPS = 12;
 const MAX_TOOL_CALLS = 30;
 
-const AGENT_SYSTEM_PROMPT = `You are an autonomous cost-optimization agent for a D2C brand.
-
+const AGENT_SYSTEM_PROMPT = `You are an autonomous cost-optimization agent for a D2C brand in India.
+ 
 ## YOUR GOAL
 Analyse the merchant's unified data (Shopify orders, Shiprocket shipments, Google Sheets expenses) and identify the most impactful ₹-saving or ops-saving opportunities.
-
+ 
 ## HOW TO WORK
 1. Start with get_overview to understand the business at a glance.
 2. Drill into shipments, orders, and expenses using the available tools.
 3. Look for: high shipping-cost-to-order-value ratios, elevated RTO rates by courier, expensive return processing, marketing spend with weak ROI signals, low-stock SKUs at risk of stockout.
-4. Cross-reference across sources: the most valuable insights come from joining data (e.g. a courier that is both expensive AND has high RTO).
+4. Cross-reference across sources — the most valuable insights come from joining data (e.g. a courier that is both expensive AND has high RTO).
 5. Call as many tools as you need. Be thorough.
-
+ 
 ## OUTPUT FORMAT
-When you are done analysing, you MUST respond with a JSON object and nothing else.
-The JSON must follow this exact shape:
-
+When you are done analysing, respond with a JSON object and nothing else.
+ 
+IMPORTANT: Do NOT invent or estimate savings numbers. Set estimated_savings_inr to 0 for all actions.
+Instead, populate affected_row_ids with the exact citation strings of every row that supports your finding.
+The system will compute the actual savings from the row data.
+ 
 {
   "summary": "one sentence summary of the overall situation",
   "reasoning": "2-4 sentences explaining what you found and why these actions matter",
   "proposed_actions": [
     {
-      "type": "string (e.g. courier_optimization, rto_reduction, stockout_risk, marketing_efficiency)",
+      "type": "courier_optimization | rto_reduction | stockout_risk | marketing_efficiency | margin_alert",
       "priority": "high | medium | low",
-      "estimated_savings_inr": number,
-      "affected_row_ids": ["citation strings e.g. [shiprocket:shipment:SR-001]"],
+      "estimated_savings_inr": 0,
+      "affected_row_ids": ["exact citation strings from the tool results, e.g. [shiprocket:shipment:SR-001]"],
       "title": "short title",
-      "description": "what you found, with specific numbers and citations",
-      "recommendation": "concrete action the merchant should take"
+      "description": "what you found with specific numbers and citations from the data",
+      "recommendation": "concrete action the merchant should take",
+      "savings_basis": "pct_freight_reduction | rto_cost_avoidance | stockout_lost_revenue | none"
     }
   ],
-  "failure_modes": ["list of caveats or assumptions that could make this analysis wrong"]
+  "failure_modes": ["caveats or assumptions that could make this analysis wrong"]
 }
-
+ 
 Do not wrap the JSON in markdown. Output raw JSON only.`;
 
 export interface AgentStep {
@@ -85,10 +90,25 @@ export interface AgentRunLog {
   failure_modes: string[];
 }
 
+export interface LLMAction {
+  type: string;
+  priority: "high" | "medium" | "low";
+  estimated_savings_inr: number;
+  affected_row_ids: string[];
+  title: string;
+  description: string;
+  recommendation: string;
+  savings_basis:
+    | "pct_freight_reduction"
+    | "rto_cost_avoidance"
+    | "stockout_lost_revenue"
+    | "none";
+}
+
 interface LLMOutput {
   summary: string;
   reasoning: string;
-  proposed_actions: ProposedAction[];
+  proposed_actions: LLMAction[];
   failure_modes: string[];
 }
 
@@ -147,7 +167,19 @@ export async function runShippingCostAgent(
           throw new Error(`Agent returned invalid JSON: ${raw.slice(0, 200)}`);
         }
 
-        const proposed_actions = parsed.proposed_actions ?? [];
+        // Compute savings deterministically for each action
+        const proposed_actions: ProposedAction[] = await Promise.all(
+          (parsed.proposed_actions ?? []).map(async (action) => ({
+            type: action.type,
+            priority: action.priority,
+            estimated_savings_inr: await computeSavings(action, merchantId),
+            affected_row_ids: action.affected_row_ids,
+            title: action.title,
+            description: action.description,
+            recommendation: action.recommendation,
+          })),
+        );
+
         const log: AgentRunLog = {
           run_id: runId,
           merchant_id: merchantId,
@@ -236,6 +268,7 @@ export async function runShippingCostAgent(
     };
   } catch (err) {
     const error = String(err);
+
     await saveAgentRun({
       merchantId,
       agentName: "ShippingCostAgent",
@@ -244,6 +277,7 @@ export async function runShippingCostAgent(
       error,
       steps,
     });
+
     return {
       run_id: runId,
       merchant_id: merchantId,
