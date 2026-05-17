@@ -1,7 +1,7 @@
 import { serve } from "bun";
 import index from "./index.html";
 
-const API_TARGET = "http://localhost:8000";
+const API_TARGET = "https://d2c-agent.onrender.com";
 
 const server = serve({
   port: 5173,
