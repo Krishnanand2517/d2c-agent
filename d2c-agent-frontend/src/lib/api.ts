@@ -59,6 +59,21 @@ export interface IngestResult {
   }>;
 }
 
+// CHAT
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatResponse {
+  message: string;
+  tool_calls: Array<{
+    tool: string;
+    input: Record<string, unknown>;
+    result_summary: string;
+  }>;
+}
+
 // AGENT LOG
 export interface ProposedAction {
   type: string;
@@ -108,5 +123,11 @@ export const api = {
   orders: () => apiFetch<UniversalRecord[]>("/orders"),
   shipments: () => apiFetch<UniversalRecord[]>("/shipments"),
   expenses: () => apiFetch<UniversalRecord[]>("/expenses"),
+  chat: (messages: ChatMessage[]) =>
+    apiFetch<ChatResponse>("/chat", {
+      method: "POST",
+      body: JSON.stringify({ messages }),
+    }),
+  runAgent: () => apiFetch<AgentRunLog>("/agent/run", { method: "POST" }),
   agentRuns: () => apiFetch<AgentRunLog[]>("/agent/runs"),
 };
