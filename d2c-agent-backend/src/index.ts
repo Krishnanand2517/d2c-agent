@@ -10,7 +10,11 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const MERCHANT_ID = process.env.MERCHANT_ID ?? "merchant_001";
 
-app.use(cors({ origin: ["http://localhost:5173"] }));
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://d2c-agent-blush.vercel.app"],
+  }),
+);
 app.use(express.json());
 app.use("/api", routes);
 

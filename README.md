@@ -2,6 +2,10 @@
 
 An AI agent for D2C brands. Connects to Shopify, Shiprocket, and Google Sheets, normalizes everything into a single data model, and gives founders a chat interface and an autonomous agent. Grounded in cited, traceable data.
 
+## Live Link
+
+The project is live on [https://d2c-agent-blush.vercel.app](https://d2c-agent-blush.vercel.app). The backend might take some time to load as it's the free tier on Render.
+
 ## 1. What I built
 
 ![](./readme-imgs/architecture.png)
@@ -26,7 +30,7 @@ An AI agent for D2C brands. Connects to Shopify, Shiprocket, and Google Sheets, 
 
 These three together cover the full contribution margin picture:
 
-> Revenue (Shopify) − Logistics Cost (Shiprocket) − Operational Cost (Sheets) = True Contribution Margin
+> Revenue (Shopify) - Logistics Cost (Shiprocket) - Operational Cost (Sheets) = True Contribution Margin
 
 ## 3. Schema
 
@@ -249,7 +253,7 @@ Above ~500 concurrent merchants, Postgres needs pgBouncer for connection pooling
 
 The chat and agent endpoints hit OpenAI per request with no rate limiting. At scale, add a per-merchant token bucket and a queue for agent runs **so a single large merchant doesn't exhaust the quota**.
 
-## 7. Eval — where it breaks
+## 7. Eval (where it breaks)
 
 1. **Mock data only.** All three connectors return static fixtures written explicitly in their respective files.
 
