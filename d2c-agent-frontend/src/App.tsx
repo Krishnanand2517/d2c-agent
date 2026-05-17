@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { Bot, Grid, MessageSquare } from "lucide-react";
 import {
   api,
+  type AgentRunLog,
   type HealthResponse,
   type StatsResponse,
   type UniversalRecord,
@@ -10,7 +12,6 @@ import ConnectorStatus from "./components/ConnectorStatus";
 import DataExplorer from "./components/DataExplorer";
 import ChatWindow from "./components/ChatWindow";
 import AgentPanel from "./components/AgentPanel";
-import { Bot, Grid, MessageSquare } from "lucide-react";
 
 type Tab = "chat" | "agent" | "data";
 
@@ -22,14 +23,17 @@ const App = () => {
   const [shipments, setShipments] = useState<UniversalRecord[]>([]);
   const [expenses, setExpenses] = useState<UniversalRecord[]>([]);
   const [ingesting, setIngesting] = useState(false);
+  const [agentRuns, setAgentRuns] = useState<AgentRunLog[]>([]);
+  const [agentRunning, setAgentRunning] = useState(false);
 
   const refresh = useCallback(async () => {
-    const [h, s, o, sh, ex] = await Promise.allSettled([
+    const [h, s, o, sh, ex, ar] = await Promise.allSettled([
       api.health(),
       api.stats(),
       api.orders(),
       api.shipments(),
       api.expenses(),
+      api.agentRuns(),
     ]);
 
     if (h.status === "fulfilled") setHealth(h.value);
@@ -37,6 +41,7 @@ const App = () => {
     if (o.status === "fulfilled") setOrders(o.value);
     if (sh.status === "fulfilled") setShipments(sh.value);
     if (ex.status === "fulfilled") setExpenses(ex.value);
+    if (ar.status === "fulfilled") setAgentRuns(ar.value);
   }, []);
 
   useEffect(() => {
@@ -50,6 +55,16 @@ const App = () => {
       await refresh();
     } finally {
       setIngesting(false);
+    }
+  };
+
+  const handleRunAgent = async () => {
+    setAgentRunning(true);
+    try {
+      await api.runAgent();
+      await refresh();
+    } finally {
+      setAgentRunning(false);
     }
   };
 
@@ -119,7 +134,11 @@ const App = () => {
             {tab === "chat" && <ChatWindow />}
             {tab === "agent" && (
               <div className="h-full overflow-y-auto p-6">
-                <AgentPanel />
+                <AgentPanel
+                  runs={agentRuns}
+                  onRunAgent={handleRunAgent}
+                  running={agentRunning}
+                />
               </div>
             )}
             {tab === "data" && (
