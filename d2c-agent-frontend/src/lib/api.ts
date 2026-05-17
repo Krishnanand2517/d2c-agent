@@ -107,7 +107,7 @@ export interface AgentRunLog {
 }
 
 async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/api${path}`, {
     headers: { "Content-Type": "application/json" },
     ...opts,
   });
