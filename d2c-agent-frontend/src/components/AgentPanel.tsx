@@ -38,7 +38,7 @@ const AgentPanel = ({ runs, onRunAgent, running }: AgentPanelPropTypes) => {
         </button>
       </div>
 
-      <div className="card p-4 text-xs text-ink-400 leading-relaxed">
+      <div className="card p-4 text-xs text-ink-500 leading-relaxed">
         Autonomously analyses your Shopify, Shiprocket, and Sheets data using
         AI. Decides which data to pull, spots cross-source patterns, and
         proposes cost-saving actions.

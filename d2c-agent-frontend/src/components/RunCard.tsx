@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Circle, Dot, TriangleAlert, X } from "lucide-react";
+import { CheckCircle, Circle, Dot, TriangleAlert, X } from "lucide-react";
 import type { AgentRunLog } from "../lib/api";
 import ActionCard from "./ActionCard";
 
@@ -22,7 +22,7 @@ const RunCard = ({ run }: { run: AgentRunLog }) => {
             className={`text-sm font-mono font-semibold ${STATUS_COLOR[run.status]}`}
           >
             {run.status === "completed" ? (
-              <Dot size={12} />
+              <CheckCircle size={12} />
             ) : run.status === "failed" ? (
               <X size={12} />
             ) : (

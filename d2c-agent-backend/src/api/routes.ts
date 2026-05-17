@@ -4,10 +4,42 @@ import { ingestAll } from "../ingest/ingestAll.ts";
 import { queryRecords, getStats, getAgentRuns } from "../db/queries.ts";
 import { getConnectors } from "../connectors/registry.ts";
 import { chat, type ChatMessage } from "../chat/chatHandler.ts";
-import { runShippingCostAgent } from "../agent/shippingCostAgent.ts";
+import {
+  runShippingCostAgent,
+  type AgentRunLog,
+} from "../agent/shippingCostAgent.ts";
 
 const router = Router();
 const MERCHANT_ID = process.env.MERCHANT_ID ?? "merchant_001";
+
+// Transforms a Prisma AgentRun row into the AgentRunLog shape the frontend expects
+function serializeAgentRun(
+  run: Awaited<ReturnType<typeof getAgentRuns>>[0],
+): AgentRunLog {
+  return {
+    run_id: run.id,
+    merchant_id: run.merchantId,
+    agent_name: run.agentName,
+    triggered_at: run.triggeredAt.toISOString(),
+    completed_at:
+      run.completedAt?.toISOString() ?? run.triggeredAt.toISOString(),
+    status: run.status as AgentRunLog["status"],
+    rows_examined: run.rowsExamined,
+    steps: Array.isArray(run.steps)
+      ? (run.steps as unknown as AgentRunLog["steps"])
+      : [],
+    proposed_actions: Array.isArray(run.proposedActions)
+      ? (run.proposedActions as unknown as AgentRunLog["proposed_actions"])
+      : [],
+    reasoning: run.reasoning ?? "",
+    summary:
+      run.error ??
+      (Array.isArray(run.proposedActions) && run.proposedActions.length > 0
+        ? `${run.proposedActions.length} action(s) proposed`
+        : "No anomalies detected"),
+    failure_modes: [],
+  };
+}
 
 router.get("/health", async (_req: Request, res: Response) => {
   const c = getConnectors(MERCHANT_ID);
@@ -86,7 +118,8 @@ router.post("/agent/run", async (_req: Request, res: Response) => {
 });
 
 router.get("/agent/runs", async (_req: Request, res: Response) => {
-  res.json(await getAgentRuns(MERCHANT_ID, 10));
+  const runs = await getAgentRuns(MERCHANT_ID, 10);
+  res.json(runs.map(serializeAgentRun));
 });
 
 export default router;
