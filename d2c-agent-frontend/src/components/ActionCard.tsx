@@ -33,12 +33,20 @@ const ActionCard = ({ a }: { a: ProposedAction }) => {
       <p className="text-xs text-ink-400">{a.description}</p>
 
       <button
-        onClick={() => setOpen(!open)}
-        className="text-xs text-signal-blue hover:opacity-80 transition-opacity"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1 text-xs text-signal-blue hover:opacity-80 transition-opacity"
       >
-        {open
-          ? `${(<ChevronUp size={12} />)} Hide`
-          : `${(<ChevronDown size={12} />)} Recommendation`}
+        {open ? (
+          <>
+            <ChevronUp size={12} />
+            <span>Hide</span>
+          </>
+        ) : (
+          <>
+            <ChevronDown size={12} />
+            <span>Recommendation</span>
+          </>
+        )}
       </button>
 
       {open && (
