@@ -79,20 +79,31 @@ const App = () => {
       {/* Top bar */}
       <header className="border-b border-ink-800 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-lg bg-linear-to-br from-signal-green to-signal-blue flex items-center justify-center text-ink-950 font-display font-bold text-sm">
-            AI
+          <div className="rounded-lg py-2 px-4 bg-linear-to-br from-signal-green to-signal-blue flex items-center justify-center text-ink-950 font-mono font-bold text-sm">
+            D2C Agent
           </div>
-          <span className="font-display font-bold text-ink-100">D2C Agent</span>
           <span className="text-xs text-ink-500 font-mono">merchant_001</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 font-mono">
+          <span className="text-sm">Connector Status:</span>
+
           {health?.connectors.map((c) => (
-            <span
+            <div
               key={c.source}
-              title={c.source}
-              className={`w-1.5 h-1.5 rounded-full ${c.healthy ? "bg-signal-green" : "bg-signal-red"}`}
-            />
+              className="flex items-center gap-1"
+              title={`${c.source}: ${c.healthy ? "Healthy" : "Down"}`}
+            >
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${
+                  c.healthy
+                    ? "bg-signal-green motion-safe:animate-pulse"
+                    : "bg-signal-red"
+                }`}
+              />
+
+              <span className="text-xs text-muted-foreground">{c.source}</span>
+            </div>
           ))}
         </div>
       </header>

@@ -122,9 +122,9 @@ const ChatWindow = () => {
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full py-16 px-6">
             <div className="w-12 h-12 rounded-2xl bg-ink-800 border border-ink-700 flex items-center justify-center mb-4 text-2xl">
-              <MessageSquare size={12} />
+              <MessageSquare size={18} />
             </div>
-            <h2 className="font-display font-bold text-xl mb-1">
+            <h2 className="font-display font-bold text-xl mb-2">
               Ask your data anything
             </h2>
 

@@ -64,7 +64,7 @@ const StatsOverview = ({ stats }: StatsOverviewPropTypes) => {
       {cards.map((c) => (
         <div key={c.label} className="card p-3">
           <div className="text-xs text-ink-400 font-mono">{c.label}</div>
-          <div className={`font-display font-bold text-base mt-0.5 ${c.color}`}>
+          <div className={`font-mono font-bold text-base mt-0.5 ${c.color}`}>
             {c.value}
           </div>
           <div className="text-xs text-ink-500 mt-0.5">{c.sub}</div>
