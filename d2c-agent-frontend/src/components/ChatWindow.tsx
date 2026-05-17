@@ -60,10 +60,21 @@ const ChatWindow = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  function autoResize() {
+    {
+      const el = textareaRef.current;
+      if (!el) return;
+
+      el.style.height = "auto";
+      el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+    }
+  }
 
   async function send(text: string) {
     if (!text.trim() || loading) return;
@@ -114,11 +125,17 @@ const ChatWindow = () => {
     } finally {
       setLoading(false);
     }
+
+    setInput("");
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "48px";
+    }
   }
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 min-h-0 p-4 space-y-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full py-16 px-6">
             <div className="w-12 h-12 rounded-2xl bg-ink-800 border border-ink-700 flex items-center justify-center mb-4 text-2xl">
@@ -207,8 +224,12 @@ const ChatWindow = () => {
       <div className="border-t border-ink-800 p-4">
         <div className="flex gap-2 items-end">
           <textarea
+            ref={textareaRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              autoResize();
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -217,8 +238,11 @@ const ChatWindow = () => {
             }}
             placeholder="Ask about your orders, shipments, or expenses..."
             rows={1}
-            className="flex-1 bg-ink-900 border border-ink-700 rounded-xl px-4 py-3 text-sm text-ink-100 placeholder-ink-500 resize-none focus:outline-none focus:border-ink-500 font-sans"
-            style={{ maxHeight: 120 }}
+            className="flex-1 bg-ink-900 border border-ink-700 rounded-xl px-4 py-3 text-sm text-ink-100 placeholder-ink-400 resize-none focus:outline-none focus:border-ink-500 font-sans overflow-y-auto"
+            style={{
+              maxHeight: 120,
+              minHeight: 48,
+            }}
           />
 
           <button
