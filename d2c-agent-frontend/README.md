@@ -1,4 +1,4 @@
-# bun-react-tailwind-template
+# D2C Agent Frontend
 
 To install dependencies:
 

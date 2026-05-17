@@ -1,4 +1,4 @@
-# d2c-agent-backend
+# D2C Agent Backend
 
 To install dependencies:
 
@@ -6,10 +6,16 @@ To install dependencies:
 bun install
 ```
 
-To run:
+To start a development server:
 
 ```bash
-bun run index.ts
+bun dev
+```
+
+To run for production:
+
+```bash
+bun run src/index.ts
 ```
 
 This project was created using `bun init` in bun v1.3.4. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
